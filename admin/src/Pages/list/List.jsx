@@ -3,9 +3,10 @@ import './List.css';
 import axios from 'axios';
 import { toast } from "react-toastify";
 
-const List = () => {
+// eslint-disable-next-line react/prop-types
+const List = ({url}) => {
 
-  const url = "http://localhost:4000"
+  // const url = "http://localhost:4000"
 
   const [list, setList] = useState([]);
 

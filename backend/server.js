@@ -1,7 +1,9 @@
 const express= require('express');
 const cors  = require('cors') 
+require('dotenv').config();
 const connectDB = require('./config/db');
 const foodRouter = require('./routes/foodRoute');
+const userRouter = require('./routes/userRoute');
 
 //app config
 const app = express()
@@ -17,6 +19,7 @@ connectDB();
 //api endpoints
 app.use("/api/food", foodRouter)
 app.use("/images",express.static('uploads'));
+app.use("/api/user", userRouter);
  
 
 app.listen(port,()=>{
