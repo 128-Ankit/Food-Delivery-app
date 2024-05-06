@@ -4,6 +4,8 @@ require('dotenv').config();
 const connectDB = require('./config/db');
 const foodRouter = require('./routes/foodRoute');
 const userRouter = require('./routes/userRoute');
+const cartRouter = require('./routes/cartRoute');
+const orderRouter = require('./routes/orderRoute');
 
 //app config
 const app = express()
@@ -20,6 +22,8 @@ connectDB();
 app.use("/api/food", foodRouter)
 app.use("/images",express.static('uploads'));
 app.use("/api/user", userRouter);
+app.use("/api/cart", cartRouter);
+app.use("/api/order", orderRouter);
  
 
 app.listen(port,()=>{

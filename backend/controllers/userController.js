@@ -70,15 +70,15 @@ const loginUser = async (req, res) => {
         //get data from req.body
         const {email,password} = req.body;
         //validation: is user registered or not
-        const userIsPresent = await user.findOne({email});
-        if(!userIsPresent){
+        const User = await user.findOne({email});
+        if(!User){
             res.json({
                 success:false,
                 message:"User not registered",
             })
         }
         //matched password store in db
-        const isMatch = await bcrypt.compare(password,userIsPresent.password);
+        const isMatch = await bcrypt.compare(password,User.password);
         if(!isMatch){
             return res.json({
                 success:false,
@@ -86,7 +86,7 @@ const loginUser = async (req, res) => {
             })
         }
 
-        const token = createToken(userIsPresent._id);
+        const token = createToken(User._id);
         res.json({
             success:true,
             messages:"Login successful",
