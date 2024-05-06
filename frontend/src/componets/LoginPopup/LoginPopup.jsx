@@ -3,6 +3,7 @@ import "./LoginPopup.css";
 import { assets } from "../../assets/assets";
 import { StoreContext } from "../../Context/StoreContex";
 import axios from 'axios';
+import { toast } from "react-toastify";
 
 // eslint-disable-next-line react/prop-types
 const LoginPopup = ({ setShowLogin }) => {
@@ -37,17 +38,13 @@ const LoginPopup = ({ setShowLogin }) => {
       setToken(response.data.token)
       localStorage.setItem("token", response.data.token);
       setShowLogin(false);
-      alert(response.data.message);
+      toast.success("Login successful.");
     }
     else{
-      alert(response.data.message);
+      toast.error(response.data.message);
     }
   }
-
-  // useEffect(()=>{
-  //   console.log(data);
-  // },[data])
-
+ 
   return (
     <div className="login-popup">
       <form onSubmit={onLogin} className="login-popup-container">

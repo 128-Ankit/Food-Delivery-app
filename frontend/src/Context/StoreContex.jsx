@@ -1,5 +1,6 @@
 import axios from "axios";
 import { createContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 // import { food_list } from "../assets/assets";
 
 export const StoreContext = createContext(null);
@@ -10,21 +11,52 @@ const StoreContextProvider = (props) => {
   const [token, setToken] = useState("");
   const [food_list, setFood_list] = useState([]);
 
-  const addToCart = async (itemId) => {
-    if (!cartItems[itemId]) {
-      setCartItems((prev) => ({ ...prev, [itemId]: 1 }));
-    } else {
-      setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
-    }
-    if(token){
-      await axios.post(url+"/api/cart/add",{itemId},{headers:{token}});
+  const addToCart = async (id) => {
+    try {
+      if (!cartItems[id]) {
+        setCartItems((prev) => ({ ...prev, [id]: 1 }));
+        toast.success("Added to cart");
+      } else {
+        setCartItems((prev) => ({ ...prev, [id]: prev[id] + 1 }));
+        toast.success("Added to cart");
+      }
+      if (token) {
+        await axios.post(
+          url + "/api/cart/add",
+          { id },
+          {
+            headers: {
+              Accept: "application/form-data",
+              "auth-token": token,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      }
+    } catch (error) {
+      console.error("Error adding item to cart:", error);
     }
   };
 
-  const removeFromCart =async (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
-    if(token){
-      await axios.post(url+"/api/cart/remove",{itemId},{headers:{token}});
+  const removeFromCart = async (id) => {
+    try {
+      setCartItems((prev) => ({ ...prev, [id]: prev[id] - 1 }));
+      toast.error("Removed from cart");
+      if (token) {
+        await axios.post(
+          url + "/api/cart/remove",
+          { id },
+          {
+            headers: {
+              Accept: "application/form-data",
+              "auth-token": token,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+      }
+    } catch (error) {
+      console.error("Error removing item to cart:", error);
     }
   };
 
@@ -39,26 +71,46 @@ const StoreContextProvider = (props) => {
     return totalAmount;
   };
 
-  const fetchFoodList = async ()=>{
-    const response = await axios.get(url+"/api/food/list");
-    setFood_list(response.data.data);
-  }
+  const fetchFoodList = async () => {
+    try {
+      const response = await axios.get(url + "/api/food/list");
+      setFood_list(response.data.data);
+    } catch (error) {
+      console.error("Error fetching food list:", error);
+    }
+  };
 
   const loadCartData = async (token) => {
-    const response = axios.post(url+"api/cart/get",{},{headers:{token}});
-    setCartItems(response.data.cartData);
-  }
+    try {
+      console.log(token);
+      const response = await axios.get(url + "/api/cart/get", {
+        headers: {
+          Accept: "application/form-data",
+          "auth-token": token,
+          "Content-Type": "application/json",
+        },
+      });
+      console.log(response.data);
+      setCartItems(response.data.cartData);
+    } catch (error) {
+      console.error("Error loading cart data:", error);
+    }
+  };
 
-  useEffect(()=>{
-    async function loadData(){
-      await fetchFoodList()
-      if(localStorage.getItem("token")){
-        setToken(localStorage.getItem("token"));
+  useEffect(() => {
+    async function loadData() {
+      try {
+        await fetchFoodList();
+        if (localStorage.getItem("token")) {
+          setToken(localStorage.getItem("token"));
+          await loadCartData(localStorage.getItem("token"));
+        }
+      } catch (error) {
+        console.error("Error loading data:", error);
       }
-      await loadCartData(localStorage.getItem("token"));
     }
     loadData();
-  },[])
+  }, []);
 
   const contextValue = {
     food_list,
@@ -70,7 +122,6 @@ const StoreContextProvider = (props) => {
     url,
     token,
     setToken,
-  
   };
 
   return (

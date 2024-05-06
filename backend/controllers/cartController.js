@@ -3,7 +3,6 @@ const user = require("../models/userModel");
 //add items to user cart
 const addToCart = async (req, res) => {
   try {
-    // let userData = await user.findOne({_id:req.body.userId});
     let userData = await user.findById(req.body.userId);
     console.log("User data: " + userData);
     let cartData = userData.cartData;
@@ -17,6 +16,7 @@ const addToCart = async (req, res) => {
     res.json({
       success: true,
       message: "Added to Cart",
+      cartData
     });
   } catch (error) {
     res.json({
@@ -50,6 +50,7 @@ const removeFromCart = async (req, res) => {
       res.json({
         success: true,
         message: "Removed from cart",
+        cartData
       });
 
     } catch (error) {

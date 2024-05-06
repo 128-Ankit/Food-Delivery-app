@@ -9,6 +9,7 @@ const frontend_url = "http://localhost:5173";
 
 // Function to place an order for a user
 const placeOrder = async (req, res) => {
+  console.log("placeOrder "+req.body);
   try {
     // Create a new order document
     const newOrder = new orderModel({
@@ -65,7 +66,7 @@ const placeOrder = async (req, res) => {
     console.log("Error is: " + error);
     res.json({
       success: false,
-      message: "Error: " + error.message, // Provide more specific error message
+      message: "Error: " + error.message,  
     });
   }
 };
@@ -100,15 +101,16 @@ const verifyOrder = async (req, res) => {
 const userOrders = async (req, res) => {
   try {
     const orders = await orderModel.find({ userId: req.body.userId });
+    console.log(orders);
     res.json({
       success: true,
-      data: orders,
+      orders: orders,
       message: "User Order Successful",
     });
   } catch (error) {
     console.log(error);
     res.json({
-      success: true,
+      success: false,
       message: "error",
     });
   }

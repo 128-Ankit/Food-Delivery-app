@@ -1,10 +1,12 @@
 import { useContext, useEffect, useState } from "react";
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import "./PlacedOrder.css";
 import { StoreContext } from "../../Context/StoreContex";
 import axios from "axios";
+import {toast} from 'react-toastify';
+
 const PlacedOrder = () => {
-  const { getTotalCartAmount, token, food_list, cartItems, url, } =
+  const { getTotalCartAmount, token, food_list, cartItems, url } =
     useContext(StoreContext);
   const [data, setData] = useState({
     firstName: "",
@@ -17,6 +19,8 @@ const PlacedOrder = () => {
     country: "",
     phone: "",
   });
+
+  console.log("token" + token)
 
   const onChangeHandler = (event) => {
     const name = event.target.name;
@@ -40,31 +44,38 @@ const PlacedOrder = () => {
       items: orderItems,
       amount: getTotalCartAmount() + 2,
     };
-    let response = await axios.post(url+"/api/order/place", orderData, {
-      headers: { token },
+    let response = await axios.post(url + "/api/order/place", orderData, {
+      headers: {
+        Accept: "application/form-data",
+        "auth-token": token,
+        "Content-Type": "application/json",
+      },
     });
+
+    console.log(response.data);
+
     if (response.data.success) {
-      alert("Your Order has been placed Successfully");
+      toast.success("Your Order has been placed Successfully");
       const { session_url } = response.data;
       window.location.replace(session_url);
     } else {
-      alert("error");
+      toast.error("error");
     }
   };
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  useEffect(()=>{
-    if(!token){
-      navigate('/cart');
-    }
-    else if(getTotalCartAmount()===0){
+  useEffect(() => {
+    if (!token) {
+      navigate("/cart");
+      toast.warning("Please Login to checkout.")
+    } else if (getTotalCartAmount() === 0) {
       navigate("/cart");
     }
-  },[token]);
+  }, [token]);
 
   return (
-    <form onSubmit={placeOrder} className="place-order">
+    <form onSubmit={(e)=>placeOrder(e)} className="place-order">
       <div className="place-order-left">
         <p className="title">Delivery Information</p>
         <div className="multi-fields">
